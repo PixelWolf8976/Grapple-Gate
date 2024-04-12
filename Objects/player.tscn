@@ -9,8 +9,11 @@ points = PackedVector3Array(-0.125207, -0.532801, -0.480507, 0.0227831, 0.47607,
 
 [node name="Player" type="RigidBody3D"]
 lock_rotation = true
+max_contacts_reported = 6
+contact_monitor = true
 linear_damp = 3.0
 script = ExtResource("1_ybj5l")
+jumpStrength = 5.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 layers = 2

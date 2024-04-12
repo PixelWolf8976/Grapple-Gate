@@ -8,7 +8,7 @@ volumetric_fog_length = 100.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1b3k3"]
 albedo_texture = ExtResource("1_wkuwy")
-uv1_scale = Vector3(10, 10, 10)
+uv1_scale = Vector3(100, 100, 100)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_oy2rr"]
 material = SubResource("StandardMaterial3D_1b3k3")
@@ -25,7 +25,8 @@ environment = SubResource("Environment_kd1rf")
 transform = Transform3D(1, 0, 0, 0, 0.552839, 0.833288, 0, -0.833288, 0.552839, 0, 0, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0)
+layers = 7
 mesh = SubResource("PlaneMesh_oy2rr")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
