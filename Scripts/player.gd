@@ -1,7 +1,9 @@
-extends RigidBody3D
+extends CharacterBody3D
 
-@export var walkSpeed := 1200.0
-@export var jumpStrength := 1.0
+@export var walkSpeed := 1000.0
+@export var jumpStrength := 250.0
+@export var frictionSubtractor := 0.75
+@export var gravity := 9.8
 
 @onready var twistPivot := $TwistPivot
 @onready var pitchPivot := $TwistPivot/PitchPivot
@@ -19,15 +21,20 @@ var isCrouching := false
 
 func _enter_tree():
 	set_multiplayer_authority(name.to_int())
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	cam.current = is_multiplayer_authority()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if is_multiplayer_authority():
+		velocity.y += -gravity * delta
+		if is_on_floor():
+			velocity.x = 0
+			velocity.z = 0
+		
 		if Input.is_action_just_pressed("Crouch"):
 			speed = walkSpeed * 0.7
 			mesh.scale.y = 0.5
@@ -39,24 +46,24 @@ func _process(delta):
 			collision.scale.y = 1
 			isCrouching = false
 		
-		var input := Vector3.ZERO
+		if is_on_floor() && !isCrouching && Input.is_action_pressed("Jump"):
+			velocity.y += jumpStrength * delta
 		
-		if searchForStand(self.get_colliding_bodies()) && !isCrouching && Input.is_action_pressed("Jump"):
-			input.y = jumpStrength
-		
-		if searchForStand(self.get_colliding_bodies()):
-			input.x = Input.get_axis("Walk Left", "Walk Right")
-			input.z = Input.get_axis("Walk Forward", "Walk Backwards")
-			
-			var y := input.y
-			input = input.normalized()
-			input.y = y
-			
-			apply_central_force(twistPivot.basis * input * speed * delta)
-			
-			self.linear_damp = 3
-		else:
-			self.linear_damp = 0
+		if is_on_floor():
+			var fdirection := Vector3(0, 0, -1).rotated(Vector3(0, 1, 0), mesh.rotation.y)
+			var ldircetion := Vector3(0, 0, -1).rotated(Vector3(0, 1, 0), mesh.rotation.y + deg_to_rad(90))
+			if Input.is_action_pressed("Walk Forward"):
+				velocity.x += fdirection.x * speed * delta
+				velocity.z += fdirection.z * speed * delta
+			if Input.is_action_pressed("Walk Backwards"):
+				velocity.x -= fdirection.x * speed * delta
+				velocity.z -= fdirection.z * speed * delta
+			if Input.is_action_pressed("Walk Left"):
+				velocity.x += ldircetion.x * speed * delta
+				velocity.z += ldircetion.z * speed * delta
+			if Input.is_action_pressed("Walk Right"):
+				velocity.x -= ldircetion.x * speed * delta
+				velocity.z -= ldircetion.z * speed * delta
 		
 		twistPivot.rotate_y(twistInput)
 		mesh.rotate_y(twistInput)
@@ -73,12 +80,8 @@ func _process(delta):
 			get_tree().quit()
 		elif Input.is_action_just_pressed("ui_cancel") && Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-
-func searchForStand(nodes):
-	for node in nodes:
-		if node.get_collision_layer_value(1):
-			return true
-	return false
+	
+	move_and_slide()
 
 func _unhandled_input(event: InputEvent):
 	if event is InputEventMouseMotion:

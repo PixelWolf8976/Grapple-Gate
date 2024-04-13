@@ -21,6 +21,7 @@ func _on_host_pressed():
 func _on_join_pressed():
 	peer.create_client("127.0.0.1", 1027)
 	multiplayer.multiplayer_peer = peer
+	$Multiplayer.hide()
 
 func add_player(id = 1):
 	var player := playerScene.instantiate()
