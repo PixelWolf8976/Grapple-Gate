@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3 uid="uid://dqlk7i3nvjk7"]
+
+[ext_resource type="Texture2D" uid="uid://cjqvd2nhmimtw" path="res://Resources/PortGrap.png" id="1_3f0di"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y16ym"]
+albedo_texture = ExtResource("1_3f0di")
+uv1_offset = Vector3(0.5, 0.5, 0.5)
+uv1_triplanar = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_w8d7r"]
+material = SubResource("StandardMaterial3D_y16ym")
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_e6hub"]
+points = PackedVector3Array(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5)
+
+[node name="Port Grap Mesh" type="StaticBody3D"]
+collision_layer = 7
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_w8d7r")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_e6hub")
