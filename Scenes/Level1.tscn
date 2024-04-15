@@ -27,6 +27,7 @@ environment = SubResource("Environment_kd1rf")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.552839, 0.833288, 0, -0.833288, 0.552839, 0, 0, 0)
+shadow_enabled = true
 
 [node name="Collision Mesh" type="Node3D" parent="."]
 
