@@ -2,9 +2,11 @@ extends CharacterBody3D
 
 @export var walkSpeed := 500.0
 @export var jumpStrength := 300.0
+@export var grappleStrength := 10.0
 @export var frictionSubtractor := 0.75
 @export var gravity := 9.8
-@export var grappleLine := MeshInstance3D.new()
+
+var grappleLine := MeshInstance3D.new()
 
 @onready var twistPivot := $TwistPivot
 @onready var pitchPivot := $TwistPivot/PitchPivot
@@ -19,6 +21,8 @@ var pitchInput := 0.0
 var speed := walkSpeed
 var isCrouching := false
 var isGrappleing := false
+var lineOut := false
+var grapHitPoint := Vector3.ZERO
 
 @onready var cam := $TwistPivot/PitchPivot/Camera3D
 
@@ -55,21 +59,30 @@ func _process(delta):
 		if is_on_floor() && !isCrouching && Input.is_action_pressed("Jump"):
 			velocity.y += jumpStrength * delta
 		
-		if is_on_floor() && !isGrappleing:
+		if is_on_floor() && !lineOut:
 			var fdirection := Vector3(0, 0, -1).rotated(Vector3(0, 1, 0), mesh.rotation.y)
 			var ldircetion := Vector3(0, 0, -1).rotated(Vector3(0, 1, 0), mesh.rotation.y + deg_to_rad(90))
 			if Input.is_action_pressed("Walk Forward"):
-				velocity.x += fdirection.x * speed * delta
-				velocity.z += fdirection.z * speed * delta
+				velocity.x += fdirection.x
+				velocity.z += fdirection.z
 			if Input.is_action_pressed("Walk Backwards"):
-				velocity.x -= fdirection.x * speed * delta
-				velocity.z -= fdirection.z * speed * delta
+				velocity.x -= fdirection.x
+				velocity.z -= fdirection.z
 			if Input.is_action_pressed("Walk Left"):
-				velocity.x += ldircetion.x * speed * delta
-				velocity.z += ldircetion.z * speed * delta
+				velocity.x += ldircetion.x
+				velocity.z += ldircetion.z
 			if Input.is_action_pressed("Walk Right"):
-				velocity.x -= ldircetion.x * speed * delta
-				velocity.z -= ldircetion.z * speed * delta
+				velocity.x -= ldircetion.x
+				velocity.z -= ldircetion.z
+		
+		var yVel = velocity.y
+		velocity.y = 0
+		velocity = velocity.normalized()
+		velocity.y = yVel
+		velocity.x *= speed * delta
+		velocity.z *= speed * delta
+		
+		#print(velocity.length())
 		
 		twistPivot.rotate_y(twistInput)
 		mesh.rotate_y(twistInput)
@@ -81,17 +94,19 @@ func _process(delta):
 		
 		if Input.is_action_pressed("Equipment Primary"):
 			isGrappleing = true
+			if aim.is_colliding() && !lineOut:
+				grapHitPoint = aim.get_collision_point()
+				lineOut = true
+		
+		if isGrappleing && lineOut:
+			grappleLine = grapLine(self.position, grapHitPoint)
+			get_tree().get_root().add_child(grappleLine)
+			var pullDirection = (self.position - grapHitPoint).normalized() * grappleStrength
+			velocity = -pullDirection
+		
 		if Input.is_action_just_released("Equipment Primary"):
 			isGrappleing = false
-		
-		if isGrappleing:
-			if aim.is_colliding():
-				var grapHitPoint = aim.get_collision_point()
-				grappleLine = grapLine(self.position, grapHitPoint)
-				get_tree().get_root().add_child(grappleLine)
-				isGrappleing = true
-			else:
-				isGrappleing = false
+			lineOut = false
 		
 		if Input.is_action_just_pressed("ui_cancel") && Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -102,6 +117,12 @@ func _process(delta):
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
 	move_and_slide()
+
+func angle_between_vectors_on_xy_plane(vec1: Vector3, vec2: Vector3) -> float:
+	var vect1 = Vector2(vec1.x, vec1.z)
+	var vect2 = Vector2(vec2.x, vec2.z)
+	var angles = (vect1 - vect2).angle()
+	return angles
 
 func grapLine(pos1: Vector3, pos2: Vector3, color = Color.SADDLE_BROWN, thickness: float = 0.1) -> MeshInstance3D:
 	var meshInstance = MeshInstance3D.new()
@@ -137,7 +158,6 @@ func grapLine(pos1: Vector3, pos2: Vector3, color = Color.SADDLE_BROWN, thicknes
 	material.albedo_color = color
 	
 	return meshInstance
-
 
 func _unhandled_input(event: InputEvent):
 	if event is InputEventMouseMotion:

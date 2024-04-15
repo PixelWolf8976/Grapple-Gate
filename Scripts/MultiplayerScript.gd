@@ -3,6 +3,8 @@ extends Node3D
 var peer := ENetMultiplayerPeer.new()
 @export var playerScene : PackedScene
 
+@onready var ip := $Multiplayer/TextEdit
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
@@ -19,9 +21,11 @@ func _on_host_pressed():
 	$Multiplayer.hide()
 
 func _on_join_pressed():
-	peer.create_client("127.0.0.1", 1027)
-	multiplayer.multiplayer_peer = peer
-	$Multiplayer.hide()
+	if peer.create_client(ip.text, 1027) != ERR_CANT_CREATE:
+		multiplayer.multiplayer_peer = peer
+		$Multiplayer.hide()
+	else:
+		ip.text = "Invalid IP!"
 
 func add_player(id = 1):
 	var player := playerScene.instantiate()

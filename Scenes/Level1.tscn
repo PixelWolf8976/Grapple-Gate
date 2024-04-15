@@ -68,6 +68,13 @@ offset_right = 304.0
 offset_bottom = 274.0
 text = "Join"
 
+[node name="TextEdit" type="TextEdit" parent="Multiplayer"]
+offset_left = 304.0
+offset_top = 139.0
+offset_right = 608.0
+offset_bottom = 274.0
+placeholder_text = "Enter IP here"
+
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://Objects/player.tscn")
 spawn_path = NodePath("..")
