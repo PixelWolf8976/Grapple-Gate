@@ -11,7 +11,7 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	print(1/delta)
+	print("FPS:", 1/delta)
 
 func _on_host_pressed():
 	peer.create_server(1027)

@@ -15,7 +15,7 @@ var grappleLine := MeshInstance3D.new()
 @onready var collision := $CollisionShape3D
 @onready var aim := $TwistPivot/PitchPivot/RayCast3D
 
-var mouseSensitivity := 0.001
+var mouseSensitivity := 0.0025
 var twistInput := 0.0
 var pitchInput := 0.0
 var speed := walkSpeed
@@ -82,7 +82,7 @@ func _process(delta):
 		velocity.x *= speed * delta
 		velocity.z *= speed * delta
 		
-		#print(velocity.length())
+		print("Player Speed: ", velocity.length())
 		
 		twistPivot.rotate_y(twistInput)
 		mesh.rotate_y(twistInput)
@@ -92,21 +92,19 @@ func _process(delta):
 		twistInput = 0.0
 		pitchInput = 0.0
 		
-		if Input.is_action_pressed("Equipment Primary"):
-			isGrappleing = true
+		if Input.is_action_just_pressed("Equipment Primary"):
 			if aim.is_colliding() && !lineOut:
 				grapHitPoint = aim.get_collision_point()
 				lineOut = true
+			elif lineOut:
+				lineOut = false
 		
-		if isGrappleing && lineOut:
+		if lineOut:
 			grappleLine = grapLine(self.position, grapHitPoint)
 			get_tree().get_root().add_child(grappleLine)
 			var pullDirection = (self.position - grapHitPoint).normalized() * grappleStrength
 			velocity = -pullDirection
-		
-		if Input.is_action_just_released("Equipment Primary"):
-			isGrappleing = false
-			lineOut = false
+			#lastPos = self.position
 		
 		if Input.is_action_just_pressed("ui_cancel") && Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)

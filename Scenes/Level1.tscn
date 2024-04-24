@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://qj3th8bjm2q0"]
+[gd_scene load_steps=10 format=3 uid="uid://qj3th8bjm2q0"]
 
 [ext_resource type="Script" path="res://Scripts/MultiplayerScript.gd" id="1_qqcm1"]
 [ext_resource type="PackedScene" uid="uid://cn6n730ruj3y1" path="res://Objects/player.tscn" id="2_480da"]
 [ext_resource type="PackedScene" uid="uid://dqlk7i3nvjk7" path="res://Objects/port_grap_mesh.tscn" id="3_24vke"]
 [ext_resource type="Texture2D" uid="uid://cjqvd2nhmimtw" path="res://Resources/PortGrap.png" id="3_a7lfq"]
+[ext_resource type="Script" path="res://Scenes/LightScript.gd" id="3_ao1v7"]
 
 [sub_resource type="Environment" id="Environment_kd1rf"]
 volumetric_fog_length = 100.0
@@ -25,9 +26,13 @@ playerScene = ExtResource("2_480da")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_kd1rf")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.552839, 0.833288, 0, -0.833288, 0.552839, 0, 0, 0)
+[node name="Light Direction" type="Node3D" parent="."]
+transform = Transform3D(0.973579, 0, 0.228351, 0, 1, 0, -0.228351, 0, 0.973579, 0, 0, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Light Direction"]
+transform = Transform3D(1, 0, 0, 0, -0.604599, 0.79653, 0, -0.79653, -0.604599, 0, 0, 0)
 shadow_enabled = true
+script = ExtResource("3_ao1v7")
 
 [node name="Collision Mesh" type="Node3D" parent="."]
 
