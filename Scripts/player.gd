@@ -1,10 +1,15 @@
 extends CharacterBody3D
 
+@export_category("Movement Settings")
 @export var walkSpeed := 500.0
 @export var jumpStrength := 300.0
 @export var grappleStrength := 10.0
 @export var frictionSubtractor := 0.75
 @export var gravity := 9.8
+
+@export_category("Abilities")
+@export var grapAbil := false
+@export var portAbil := false
 
 var grappleLine := MeshInstance3D.new()
 
@@ -21,7 +26,7 @@ var pitchInput := 0.0
 var speed := walkSpeed
 var isCrouching := false
 var isGrappleing := false
-var lineOut := false
+var pullLineOut := false
 var grapHitPoint := Vector3.ZERO
 
 @onready var cam := $TwistPivot/PitchPivot/Camera3D
@@ -59,7 +64,7 @@ func _process(delta):
 		if is_on_floor() && !isCrouching && Input.is_action_pressed("Jump"):
 			velocity.y += jumpStrength * delta
 		
-		if is_on_floor() && !lineOut:
+		if is_on_floor() && !pullLineOut:
 			var fdirection := Vector3(0, 0, -1).rotated(Vector3(0, 1, 0), mesh.rotation.y)
 			var ldircetion := Vector3(0, 0, -1).rotated(Vector3(0, 1, 0), mesh.rotation.y + deg_to_rad(90))
 			if Input.is_action_pressed("Walk Forward"):
@@ -93,13 +98,13 @@ func _process(delta):
 		pitchInput = 0.0
 		
 		if Input.is_action_just_pressed("Equipment Primary"):
-			if aim.is_colliding() && !lineOut:
+			if aim.is_colliding() && !pullLineOut:
 				grapHitPoint = aim.get_collision_point()
-				lineOut = true
-			elif lineOut:
-				lineOut = false
+				pullLineOut = true
+			elif pullLineOut:
+				pullLineOut = false
 		
-		if lineOut:
+		if pullLineOut:
 			grappleLine = grapLine(self.position, grapHitPoint)
 			get_tree().get_root().add_child(grappleLine)
 			var pullDirection = (self.position - grapHitPoint).normalized() * grappleStrength
