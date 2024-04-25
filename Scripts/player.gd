@@ -12,6 +12,7 @@ extends CharacterBody3D
 @export var portAbil := false
 
 var grappleLine := MeshInstance3D.new()
+@onready var grappleHinge := $Generic6DOFJoint3D
 
 @onready var twistPivot := $TwistPivot
 @onready var pitchPivot := $TwistPivot/PitchPivot
@@ -27,6 +28,7 @@ var speed := walkSpeed
 var isCrouching := false
 var isGrappleing := false
 var pullLineOut := false
+var swingLineOut := false
 var grapHitPoint := Vector3.ZERO
 
 @onready var cam := $TwistPivot/PitchPivot/Camera3D
@@ -97,12 +99,30 @@ func _process(delta):
 		twistInput = 0.0
 		pitchInput = 0.0
 		
-		if Input.is_action_just_pressed("Equipment Primary"):
+		if Input.is_action_just_pressed("Equipment Primary") && !swingLineOut:
 			if aim.is_colliding() && !pullLineOut:
 				grapHitPoint = aim.get_collision_point()
 				pullLineOut = true
 			elif pullLineOut:
 				pullLineOut = false
+		
+		if Input.is_action_just_pressed("Equipment Secondary") && !pullLineOut:
+			if aim.is_colliding() && !swingLineOut:
+				grapHitPoint = aim.get_collision_point()
+				swingLineOut = true
+			elif swingLineOut:
+				swingLineOut = false
+		
+		if swingLineOut:
+			grappleHinge.position = grapHitPoint
+			grappleHinge.set_node_a(get_path())
+			print(get_path())
+			get_tree().get_root().add_child(grappleHinge)
+			grappleLine = grapLine(self.position, grapHitPoint)
+			get_tree().get_root().add_child(grappleLine)
+		elif !swingLineOut && grappleHinge != null:
+			grappleHinge.node_a = ""
+			get_tree().get_root().remove_child(grappleHinge)
 		
 		if pullLineOut:
 			grappleLine = grapLine(self.position, grapHitPoint)

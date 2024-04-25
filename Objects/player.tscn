@@ -40,6 +40,14 @@ axis_lock_angular_y = true
 floor_constant_speed = true
 script = ExtResource("1_pbrad")
 
+[node name="Generic6DOFJoint3D" type="Generic6DOFJoint3D" parent="."]
+angular_limit_x/enabled = false
+angular_limit_x/damping = 16.0
+angular_limit_y/enabled = false
+angular_limit_y/damping = 16.0
+angular_limit_z/enabled = false
+angular_limit_z/damping = 16.0
+
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 layers = 2
 mesh = SubResource("CapsuleMesh_1cmvg")
@@ -55,8 +63,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 [node name="Camera3D" type="Camera3D" parent="TwistPivot/PitchPivot"]
 
 [node name="RayCast3D" type="RayCast3D" parent="TwistPivot/PitchPivot"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
-target_position = Vector3(0, -10, 0)
+target_position = Vector3(0, 0, -15)
 collision_mask = 2
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
